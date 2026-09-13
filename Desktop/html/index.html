@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banca Inteligente - Bancoagrícola</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --sidebar-bg: #111827;
+            --sidebar-hover: #1f2937;
+            --sidebar-text: #9ca3af;
+            --sidebar-active: #ffffff;
+            --accent-orange: #f97316;
+            --bg-light: #f3f4f6;
+            --text-dark: #111827;
+            --text-muted: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --green: #10b981;
+            --green-bg: #d1fae5;
+            --purple: #8b5cf6;
+            --purple-bg: #ede9fe;
+            --orange: #f59e0b;
+            --orange-bg: #fef3c7;
+            --red: #ef4444;
+            --red-bg: #fee2e2;
+            --blue: #3b82f6;
+            --btn-dark: #1f2937;
+            --hover-bg: #f9fafb;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { display: flex; background-color: var(--bg-light); min-height: 100vh; color: var(--text-dark); }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background-color: var(--sidebar-bg); color: var(--sidebar-text); display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; position: sticky; top: 0; box-shadow: 2px 0 5px rgba(0,0,0,0.1); }
+        .logo-section { display: flex; align-items: center; padding: 24px 20px; gap: 12px; border-bottom: 1px solid #1f2937; }
+        .logo-section img { width: 40px; height: 40px; border-radius: 8px; background-color: white; padding: 2px; }
+        .logo-text h1 { color: var(--white); font-size: 16px; font-weight: 600; }
+        .logo-text p { font-size: 12px; color: var(--sidebar-text); }
+        .menu-group { padding: 20px 0; }
+        .menu-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding: 0 20px 10px; color: #6b7280; }
+        .menu-item { display: flex; align-items: center; padding: 12px 20px; gap: 12px; cursor: pointer; text-decoration: none; color: var(--sidebar-text); font-size: 14px; transition: all 0.3s ease; position: relative; }
+        .menu-item:hover { background-color: var(--sidebar-hover); color: var(--white); padding-left: 25px; }
+        .menu-item.active { color: var(--white); background-color: var(--sidebar-hover); }
+        .menu-item.active::after { content: ''; position: absolute; right: 0; top: 10%; height: 80%; width: 4px; background-color: var(--accent-orange); border-radius: 4px 0 0 4px; }
+        .user-profile { margin-top: auto; padding: 20px; border-top: 1px solid #1f2937; display: flex; align-items: center; justify-content: space-between; transition: background-color 0.3s; }
+        .user-profile:hover { background-color: var(--sidebar-hover); }
+        .user-info-container { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; background-color: var(--accent-orange); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; position: relative; }
+        .status-dot { position: absolute; bottom: 0; right: 0; width: 10px; height: 10px; background-color: var(--green); border-radius: 50%; border: 2px solid var(--sidebar-bg); }
+        .user-details h4 { color: white; font-size: 14px; font-weight: 500; }
+        .user-details p { font-size: 12px; }
+        .logout-btn { color: var(--sidebar-text); cursor: pointer; transition: color 0.3s; }
+        .logout-btn:hover { color: var(--accent-orange); }
+
+        /* Main Content & SPA Setup */
+        .main-content { flex: 1; padding: 24px 32px; overflow-y: auto; }
+        .view-section { display: none; animation: fadeIn 0.4s ease-in-out; }
+        .view-section.active-view { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Header */
+        .top-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
+        .header-title p { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; }
+        .header-title h2 { font-size: 24px; font-weight: 700; }
+        .header-actions { display: flex; align-items: center; gap: 16px; }
+        .search-bar { display: flex; align-items: center; background-color: var(--white); padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border-color); width: 250px; transition: box-shadow 0.3s, border-color 0.3s; }
+        .search-bar:focus-within { box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.2); border-color: var(--accent-orange); }
+        .search-bar input { border: none; outline: none; margin-left: 8px; width: 100%; font-size: 14px; }
+        .search-bar i { color: var(--text-muted); }
+        .date-display { font-size: 14px; color: var(--text-muted); display: flex; align-items: center; gap: 8px; }
+        .notification { position: relative; background-color: var(--white); width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); cursor: pointer; transition: all 0.3s; }
+        .notification:hover { background-color: var(--hover-bg); transform: scale(1.05); }
+        .badge { position: absolute; top: -2px; right: -2px; background-color: var(--accent-orange); color: white; font-size: 10px; font-weight: bold; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+        /* Cards, Grids & Interactive KPIs */
+        .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 24px; }
+        .card, .kpi-card { background-color: var(--white); border-radius: 12px; border: 1px solid var(--border-color); padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .kpi-clickable { cursor: pointer; border: 2px solid transparent; }
+        .kpi-clickable:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: var(--border-color); }
+        .kpi-clickable.selected-kpi { border-color: var(--accent-orange); background-color: #fffaf5; }
+        .kpi-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .kpi-header h3 { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+        .icon-box { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+        .icon-gray { background: #f3f4f6; color: #4b5563; }
+        .icon-green { background: var(--green-bg); color: var(--green); }
+        .icon-purple { background: var(--purple-bg); color: var(--purple); }
+        .icon-orange { background: var(--orange-bg); color: var(--orange); }
+        .icon-red { background: var(--red-bg); color: var(--red); }
+        .kpi-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+        .kpi-subtitle { font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+        .trend-up { color: var(--green); font-weight: 600; }
+
+        .middle-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 24px; }
+        .card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .card h3 { font-size: 16px; font-weight: 600; }
+        .card p.sub { font-size: 13px; color: var(--text-muted); margin-top: 4px; margin-bottom: 16px; }
+
+        .live-badge { background-color: var(--green-bg); color: var(--green); font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px; }
+        .live-badge::before { content: ''; width: 6px; height: 6px; background-color: var(--green); border-radius: 50%; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+        /* Active Calls Lists */
+        .agent-list { display: flex; flex-direction: column; gap: 16px; }
+        .agent-item { display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 1px solid var(--border-color); transition: background-color 0.3s; padding: 10px; border-radius: 8px;}
+        .agent-item:hover { background-color: var(--hover-bg); }
+        .agent-item:last-child { border-bottom: none; }
+        .agent-info { display: flex; align-items: center; gap: 12px; width: 200px; }
+        .agent-avatar { width: 36px; height: 36px; border-radius: 50%; background-color: #1e3a8a; color: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+        .agent-text h4 { font-size: 14px; font-weight: 600; }
+        .agent-text p { font-size: 12px; color: var(--text-muted); }
+        .call-time { font-size: 13px; display: flex; align-items: center; gap: 6px; width: 80px; }
+
+        .tag { font-size: 12px; font-weight: 500; padding: 4px 10px; border-radius: 6px; width: 120px; text-align: center; }
+        .tag-orange { background: var(--orange-bg); color: var(--orange); }
+        .tag-purple { background: var(--purple-bg); color: var(--purple); }
+        .tag-green { background: var(--green-bg); color: var(--green); }
+        .tag-gray { background: #f3f4f6; color: #4b5563; }
+        .tag-red { background: var(--red-bg); color: var(--red); }
+        .tag-blue { background: #e0f2fe; color: #0284c7; }
+        .emoji { font-size: 18px; }
+
+        /* Buttons */
+        .btn-group { display: flex; gap: 8px; }
+        .btn-dark { background-color: var(--btn-dark); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-dark:hover { background-color: #374151; transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-outline { background-color: white; color: var(--text-dark); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-outline:hover { background-color: var(--hover-bg); border-color: #d1d5db; transform: translateY(-1px); }
+        .btn-text { background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: color 0.2s; margin-bottom: 20px;}
+        .btn-text:hover { color: var(--accent-orange); }
+
+        /* Chart CSS from original design */
+        .chart-container { height: 180px; display: flex; align-items: flex-end; justify-content: space-around; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); position: relative; }
+        .y-axis { position: absolute; left: 0; top: 0; height: 100%; display: flex; flex-direction: column; justify-content: space-between; font-size: 11px; color: var(--text-muted); padding-bottom: 20px; }
+        .bar-col { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; width: 16px; height: 100%; margin-left: 30px; gap: 2px; transition: transform 0.2s; cursor: pointer;}
+        .bar-col:hover { transform: scaleY(1.05); filter: brightness(1.1); }
+        .bar-segment { width: 100%; border-radius: 2px; }
+        .bg-darkblue { background-color: #1e3a8a; }
+        .bg-purple { background-color: var(--purple); }
+        .bg-orange { background-color: var(--accent-orange); }
+        .x-axis { display: flex; justify-content: space-around; margin-top: 10px; margin-left: 30px; font-size: 11px; color: var(--text-muted); }
+        .legend { display: flex; justify-content: center; gap: 16px; margin-top: 20px; font-size: 12px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+        /* Main Table */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 14px 10px; border-bottom: 1px solid var(--border-color); font-size: 14px; }
+        th { color: var(--text-muted); font-weight: 500; font-size: 13px; }
+        tbody tr { transition: background-color 0.2s ease, transform 0.2s ease; }
+        tbody tr:hover { background-color: #f8fafc; cursor: pointer; }
+        .client-cell { display: flex; align-items: center; gap: 12px; }
+        .client-initials { width: 32px; height: 32px; border-radius: 50%; background-color: #f3f4f6; color: #4b5563; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; }
+        .bold-text { font-weight: 600; }
+        .text-orange { color: var(--accent-orange); font-weight: 600; }
+        .pagination { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+
+        /* Chat UI */
+        .chat-container { border: 1px solid var(--border-color); border-radius: 8px; background: #fff; display: flex; flex-direction: column; height: 500px; }
+        .chat-header { padding: 16px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border-radius: 8px 8px 0 0; }
+        .chat-body { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; background: #f0f2f5;}
+        .message { max-width: 70%; padding: 12px 16px; border-radius: 12px; font-size: 14px; line-height: 1.5; position: relative; }
+        .msg-agent { background: white; align-self: flex-start; border: 1px solid var(--border-color); border-bottom-left-radius: 4px; }
+        .msg-client { background: #dcf8c6; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-time { font-size: 10px; color: var(--text-muted); margin-top: 4px; text-align: right; display: block;}
+        .chat-footer { padding: 16px; border-top: 1px solid var(--border-color); background: white; border-radius: 0 0 8px 8px; }
+        .chat-input-wrapper { display: flex; gap: 10px; align-items: center; }
+        .chat-input { flex: 1; padding: 12px; border: 1px solid var(--border-color); border-radius: 20px; outline: none; font-size: 14px; transition: border 0.3s;}
+        .chat-input:focus { border-color: var(--accent-orange); }
+        .chat-input:disabled { background: var(--bg-light); cursor: not-allowed; }
+        .intervention-banner { background: var(--red-bg); color: var(--red); padding: 8px; text-align: center; font-size: 12px; font-weight: 600; display: none; }
+
+        /* Progress Bar & Forms */
+        .progress-bar { width: 100%; height: 8px; background: var(--border-color); border-radius: 4px; margin-top: 8px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--green); border-radius: 4px; width: 0%; transition: width 1s ease; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 14px; outline: none; transition: border-color 0.3s; }
+        .form-control:focus { border-color: var(--accent-orange); }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="logo-section">
+            <img src="logo ba.png" alt="Logo Banca Inteligente">
+            <div class="logo-text"><h1>Banca Inteligente</h1><p>Bancoagrícola</p></div>
+        </div>
+        <div class="menu-group">
+            <div class="menu-title">Menú Principal</div>
+            <a class="menu-item active" data-target="cartera"><i class="fa-solid fa-briefcase"></i> Cartera de gestión</a>
+            <a class="menu-item" data-target="llamadas"><i class="fa-solid fa-phone-volume"></i> Llamadas en curso</a>
+            <a class="menu-item" data-target="metricas"><i class="fa-solid fa-chart-line"></i> Métricas de recuperación</a>
+            <a class="menu-item" data-target="reglas"><i class="fa-solid fa-list-check"></i> Reglas de negociación</a>
+        </div>
+        <div class="menu-group">
+            <div class="menu-title">Configuración</div>
+            <a class="menu-item" data-target="voz"><i class="fa-solid fa-headset"></i> Voz del agente IA</a>
+            <a class="menu-item" data-target="deudas"><i class="fa-solid fa-file-invoice-dollar"></i> Tipos de deuda</a>
+        </div>
+        <div class="user-profile">
+            <div class="user-info-container">
+                <div class="avatar">AR<div class="status-dot"></div></div>
+                <div class="user-details"><h4>Ana Ramírez</h4><p>Supervisora</p></div>
+            </div>
+            <i class="fa-solid fa-arrow-right-from-bracket logout-btn"></i>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- HEADER GENERAL -->
+        <header class="top-header">
+            <div class="header-title">
+                <p id="breadcrumb">Cartera de gestión > Vista general</p>
+                <h2 id="pageTitle">Banca Inteligente</h2>
+            </div>
+            <div class="header-actions">
+                <div class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input type="text" placeholder="Buscar cliente o cuenta..."></div>
+                <div class="date-display"><i class="fa-regular fa-calendar"></i> Hoy, 12 Oct • 10:45 AM</div>
+                <div class="notification"><i class="fa-regular fa-bell"></i><span class="badge">3</span></div>
+            </div>
+        </header>
+
+        <!-- ============================================== -->
+        <!-- VISTA 1: CARTERA DE GESTIÓN (Principal)        -->
+        <!-- ============================================== -->
+        <div id="cartera" class="view-section active-view">
+            <!-- KPIs interactivos -->
+            <section class="kpi-grid">
+                <div class="kpi-card kpi-clickable" onclick="filtrarTabla('Todas', this)">
+                    <div class="kpi-header"><h3>Cuentas Asignadas</h3><div class="icon-box icon-gray"><i class="fa-regular fa-folder"></i></div></div>
+                    <div class="kpi-value">1,247</div><div class="kpi-subtitle">En cartera activa</div>
+                </div>
+                <div class="kpi-card kpi-clickable" onclick="filtrarTabla('Contactado', this)">
+                    <div class="kpi-header"><h3>Contactos Exitosos</h3><div class="icon-box icon-green"><i class="fa-solid fa-phone"></i></div></div>
+                    <div class="kpi-value">834</div><div class="kpi-subtitle"><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 4.2%</span> 66.8% efectividad</div>
+                </div>
+                <div class="kpi-card kpi-clickable" onclick="filtrarTabla('Promesa', this)">
+                    <div class="kpi-header"><h3>Promesas de Pago</h3><div class="icon-box icon-purple"><i class="fa-regular fa-handshake"></i></div></div>
+                    <div class="kpi-value">312</div><div class="kpi-subtitle"><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 12%</span> En proceso</div>
+                </div>
+                <div class="kpi-card kpi-clickable" onclick="filtrarTabla('En gestión', this)">
+                    <div class="kpi-header"><h3>Recuperación del Mes</h3><div class="icon-box icon-orange"><i class="fa-solid fa-chart-pie"></i></div></div>
+                    <div class="kpi-value">$2.4M</div><div class="kpi-subtitle">78.3% meta alcanzada</div>
+                </div>
+            </section>
+
+            <!-- Sección Media: Llamadas y Gráfico Original -->
+            <section class="middle-grid">
+                <div class="card">
+                    <div class="card-header-flex">
+                        <h3>Llamadas Activas del Agente IA</h3>
+                        <span class="live-badge">En vivo</span>
+                    </div>
+                    <div class="agent-list">
+                        <div class="agent-item">
+                            <div class="agent-info"><div class="agent-avatar">MR</div><div class="agent-text"><h4>Manuel Rodríguez</h4><p>Cuenta: 00392-12</p></div></div>
+                            <div class="call-time"><i class="fa-regular fa-clock"></i> 02:15</div>
+                            <div class="tag tag-orange">Negociando</div><div class="emoji">😐</div>
+                            <div class="btn-group">
+                                <button class="btn-dark" onclick="abrirChat('Manuel Rodríguez', 'escuchar')">Escuchar</button>
+                                <button class="btn-outline" onclick="abrirChat('Manuel Rodríguez', 'intervenir')">Intervenir</button>
+                            </div>
+                        </div>
+                        <div class="agent-item">
+                            <div class="agent-info"><div class="agent-avatar">CG</div><div class="agent-text"><h4>Carmen Gómez</h4><p>Cuenta: 00182-45</p></div></div>
+                            <div class="call-time"><i class="fa-regular fa-clock"></i> 01:40</div>
+                            <div class="tag tag-purple">Verificando</div><div class="emoji">😐</div>
+                            <div class="btn-group">
+                                <button class="btn-dark" onclick="abrirChat('Carmen Gómez', 'escuchar')">Escuchar</button>
+                                <button class="btn-outline" onclick="abrirChat('Carmen Gómez', 'intervenir')">Intervenir</button>
+                            </div>
+                        </div>
+                        <div class="agent-item">
+                            <div class="agent-info"><div class="agent-avatar">JA</div><div class="agent-text"><h4>Jorge Alvara...</h4><p>Cuenta: 00847-92</p></div></div>
+                            <div class="call-time"><i class="fa-regular fa-clock"></i> 03:05</div>
+                            <div class="tag tag-green">Cerrando</div><div class="emoji">🤩</div>
+                            <div class="btn-group">
+                                <button class="btn-dark" onclick="abrirChat('Jorge Alvarado', 'escuchar')">Escuchar</button>
+                                <button class="btn-outline" onclick="abrirChat('Jorge Alvarado', 'intervenir')">Intervenir</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Rendimiento de Recuperación</h3>
+                    <p class="sub">Montos recuperados diariamente este mes</p>
+                    <div class="chart-container">
+                        <div class="y-axis"><span>$400k</span><span>$200k</span><span>$100k</span><span>$0</span></div>
+                        <div class="bar-col"><div class="bar-segment bg-orange" style="height: 10%;"></div><div class="bar-segment bg-purple" style="height: 30%;"></div><div class="bar-segment bg-darkblue" style="height: 50%;"></div></div>
+                        <div class="bar-col"><div class="bar-segment bg-orange" style="height: 12%;"></div><div class="bar-segment bg-purple" style="height: 25%;"></div><div class="bar-segment bg-darkblue" style="height: 55%;"></div></div>
+                        <div class="bar-col"><div class="bar-segment bg-orange" style="height: 5%;"></div><div class="bar-segment bg-purple" style="height: 35%;"></div><div class="bar-segment bg-darkblue" style="height: 60%;"></div></div>
+                        <div class="bar-col"><div class="bar-segment bg-orange" style="height: 8%;"></div><div class="bar-segment bg-purple" style="height: 20%;"></div><div class="bar-segment bg-darkblue" style="height: 65%;"></div></div>
+                        <div class="bar-col"><div class="bar-segment bg-orange" style="height: 15%;"></div><div class="bar-segment bg-purple" style="height: 15%;"></div><div class="bar-segment bg-darkblue" style="height: 70%;"></div></div>
+                        <div class="bar-col"><div class="bar-segment bg-orange" style="height: 12%;"></div><div class="bar-segment bg-purple" style="height: 40%;"></div><div class="bar-segment bg-darkblue" style="height: 35%;"></div></div>
+                        <div class="bar-col"><div class="bar-segment bg-orange" style="height: 8%;"></div><div class="bar-segment bg-purple" style="height: 12%;"></div><div class="bar-segment bg-darkblue" style="height: 25%;"></div></div>
+                    </div>
+                    <div class="x-axis"><span>Lun 10</span><span>Mar 11</span><span>Mié 12</span><span>Jue 13</span><span>Vie 14</span><span>Sáb 15</span><span>Dom 16</span></div>
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot bg-darkblue"></div>Pago completo</div>
+                        <div class="legend-item"><div class="legend-dot bg-purple"></div>Pago parcial</div>
+                        <div class="legend-item"><div class="legend-dot bg-orange"></div>Promesa de pago</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tabla de Detalle Original con Filtro -->
+            <section class="card">
+                <div class="table-header-flex">
+                    <div>
+                        <h3>Detalle de Cartera</h3>
+                        <p class="sub" style="margin-bottom: 0;">Estado general de la cartera de clientes asignados</p>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn-outline">Filtros</button>
+                        <button class="btn-dark">Exportar CSV</button>
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr><th>Cliente</th><th>Cuenta</th><th>Saldo Pendiente</th><th>Días de Mora</th><th>Último Contacto</th><th>Estado</th><th>Acción</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr class="fila-tabla" data-estado="Contactado">
+                            <td><div class="client-cell"><div class="client-initials">MA</div><span class="bold-text">Mauricio Flores</span></div></td>
+                            <td>00392-12</td><td class="bold-text">$1,450.00</td><td class="bold-text">45 días</td><td>Ayer, 3:20 PM</td>
+                            <td><span class="tag tag-green" style="width: auto;">Contactado</span></td>
+                            <td><button class="btn-outline" onclick="abrirDetalleCliente('Mauricio Flores', '00392-12', 1450, 45, 'Contactado')">Ver detalle</button></td>
+                        </tr>
+                        <tr class="fila-tabla" data-estado="Promesa">
+                            <td><div class="client-cell"><div class="client-initials">GA</div><span class="bold-text">Gabriela Henríquez</span></div></td>
+                            <td>00182-45</td><td class="bold-text">$3,800.00</td><td class="text-orange">120 días</td><td>10 Oct 2026</td>
+                            <td><span class="tag tag-purple" style="width: auto;">Promesa</span></td>
+                            <td><button class="btn-outline" onclick="abrirDetalleCliente('Gabriela Henríquez', '00182-45', 3800, 120, 'Promesa')">Ver detalle</button></td>
+                        </tr>
+                        <tr class="fila-tabla" data-estado="En gestión">
+                            <td><div class="client-cell"><div class="client-initials">RO</div><span class="bold-text">Roberto Quintanilla</span></div></td>
+                            <td>00847-92</td><td class="bold-text">$950.00</td><td class="bold-text">15 días</td><td>Hace 3 días</td>
+                            <td><span class="tag tag-orange" style="width: auto;">En gestión</span></td>
+                            <td><button class="btn-outline" onclick="abrirDetalleCliente('Roberto Quintanilla', '00847-92', 950, 15, 'En gestión')">Ver detalle</button></td>
+                        </tr>
+                        <tr class="fila-tabla" data-estado="Sin contacto">
+                            <td><div class="client-cell"><div class="client-initials">EL</div><span class="bold-text">Elena de Meza</span></div></td>
+                            <td>00561-34</td><td class="bold-text">$750.00</td><td class="bold-text">60 días</td><td>Sin contacto</td>
+                            <td><span class="tag tag-red" style="width: auto;">Sin contacto</span></td>
+                            <td><button class="btn-outline" onclick="abrirDetalleCliente('Elena de Meza', '00561-34', 750, 60, 'Sin contacto')">Ver detalle</button></td>
+                        </tr>
+                        <tr class="fila-tabla" data-estado="Promesa">
+                            <td><div class="client-cell"><div class="client-initials">CA</div><span class="bold-text">Carlos Altamirano</span></div></td>
+                            <td>00412-88</td><td class="bold-text">$2,100.00</td><td class="text-orange">95 días</td><td>08 Oct 2026</td>
+                            <td><span class="tag tag-purple" style="width: auto;">Promesa</span></td>
+                            <td><button class="btn-outline" onclick="abrirDetalleCliente('Carlos Altamirano', '00412-88', 2100, 95, 'Promesa')">Ver detalle</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="pagination">
+                    <span>Mostrando 1-5 de 1,247 clientes</span>
+                    <div class="btn-group"><button class="btn-outline">Anterior</button><button class="btn-dark">Siguiente</button></div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VISTA 2: LLAMADAS EN CURSO                     -->
+        <!-- ============================================== -->
+        <div id="llamadas" class="view-section">
+            <div class="card">
+                <div class="table-header-flex">
+                    <div>
+                        <h3>Monitor Global de Llamadas</h3>
+                        <p class="sub" style="margin-bottom: 0;">Centro de control en tiempo real del Agente IA</p>
+                    </div>
+                    <span class="live-badge">12 Llamadas Simultáneas</span>
+                </div>
+                <table>
+                    <thead><tr><th>Cliente</th><th>Intención Detectada</th><th>Duración</th><th>Sentimiento</th><th>Estado</th><th>Acciones en vivo</th></tr></thead>
+                    <tbody>
+                        <tr><td><div class="client-cell"><div class="client-initials" style="background:#1e3a8a; color:white;">JL</div><span class="bold-text">José López</span></div></td><td>Negociar cuotas</td><td>04:12</td><td><span class="tag tag-green" style="width:auto">Positivo</span></td><td><span class="tag tag-orange" style="width:auto">En proceso</span></td><td><button class="btn-outline" onclick="abrirChat('José López', 'escuchar')">Escuchar</button></td></tr>
+                        <tr><td><div class="client-cell"><div class="client-initials" style="background:#1e3a8a; color:white;">MS</div><span class="bold-text">María Salazar</span></div></td><td>Consulta de saldo</td><td>01:30</td><td><span class="tag tag-gray" style="width:auto">Neutral</span></td><td><span class="tag tag-blue" style="width:auto">Resolviendo</span></td><td><button class="btn-outline" onclick="abrirChat('María Salazar', 'escuchar')">Escuchar</button></td></tr>
+                        <tr><td><div class="client-cell"><div class="client-initials" style="background:#1e3a8a; color:white;">RP</div><span class="bold-text">Ricardo Peña</span></div></td><td>Queja por mora</td><td>06:45</td><td><span class="tag tag-red" style="width:auto">Frustrado</span></td><td><span class="tag tag-red" style="width:auto">Requiere Humano</span></td><td><button class="btn-dark" onclick="abrirChat('Ricardo Peña', 'intervenir')">Intervenir</button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VISTA 3: MÉTRICAS DE RECUPERACIÓN              -->
+        <!-- ============================================== -->
+        <div id="metricas" class="view-section">
+            <section class="grid-3">
+                <div class="kpi-card">
+                    <div class="kpi-header"><h3>Total Recuperado Mensual</h3><div class="icon-box icon-green"><i class="fa-solid fa-dollar-sign"></i></div></div>
+                    <div class="kpi-value">$2,450,000</div><div class="kpi-subtitle"><span class="trend-up"><i class="fa-solid fa-arrow-up"></i> 5.4%</span> vs Mes anterior</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-header"><h3>Tasa de Promesas Cumplidas</h3><div class="icon-box icon-purple"><i class="fa-solid fa-check-double"></i></div></div>
+                    <div class="kpi-value">82%</div><div class="kpi-subtitle">De 312 promesas generadas</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-header"><h3>Ahorro Operativo IA</h3><div class="icon-box icon-orange"><i class="fa-solid fa-robot"></i></div></div>
+                    <div class="kpi-value">450 Hrs</div><div class="kpi-subtitle">Tiempo humano ahorrado</div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VISTA 4: REGLAS DE NEGOCIACIÓN                 -->
+        <!-- ============================================== -->
+        <div id="reglas" class="view-section">
+            <div class="card">
+                <div class="table-header-flex">
+                    <div>
+                        <h3>Reglas Activas del Modelo IA</h3>
+                        <p class="sub">Límites y concesiones autorizadas para el asistente virtual</p>
+                    </div>
+                    <button class="btn-dark">+ Nueva Regla</button>
+                </div>
+                <table>
+                    <thead><tr><th>Condición del Cliente</th><th>Acción Permitida por IA</th><th>Límite Máximo</th><th>Estado</th><th>Ajustar</th></tr></thead>
+                    <tbody>
+                        <tr><td class="bold-text">Mora > 90 días</td><td>Ofrecer refinanciamiento</td><td>Hasta 24 meses</td><td><span class="tag tag-green">Activa</span></td><td><button class="btn-outline"><i class="fa-solid fa-pen"></i></button></td></tr>
+                        <tr><td class="bold-text">Pago total inmediato</td><td>Aplicar descuento a intereses</td><td>15% desc.</td><td><span class="tag tag-green">Activa</span></td><td><button class="btn-outline"><i class="fa-solid fa-pen"></i></button></td></tr>
+                        <tr><td class="bold-text">Cliente reincidente</td><td>Transferir a agente humano</td><td>Al 2do fallo</td><td><span class="tag tag-orange">Pausada</span></td><td><button class="btn-outline"><i class="fa-solid fa-pen"></i></button></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VISTA 5: VOZ DEL AGENTE IA                     -->
+        <!-- ============================================== -->
+        <div id="voz" class="view-section">
+            <div class="middle-grid">
+                <div class="card">
+                    <h3>Configuración de Personalidad</h3>
+                    <p class="sub">Ajusta el tono y estilo de habla de la IA</p>
+                    <div class="form-group"><label>Voz Asignada</label><select class="form-control"><option>Voz Femenina - Empática (Recomendado)</option><option>Voz Masculina - Formal</option></select></div>
+                    <div class="form-group"><label>Velocidad de habla</label><input type="range" min="0.5" max="1.5" step="0.1" value="1.0" style="width: 100%;"></div>
+                    <button class="btn-dark" style="margin-top: 15px;">Guardar Configuración</button>
+                </div>
+                <div class="card">
+                    <h3>Prueba de Audio</h3>
+                    <p class="sub">Escucha cómo sonará tu agente con los clientes</p>
+                    <div style="background: var(--bg-light); padding: 20px; border-radius: 8px; text-align: center; margin-top: 20px;">
+                        <i class="fa-solid fa-circle-play" style="font-size: 40px; color: var(--accent-orange); cursor: pointer;"></i>
+                        <p style="margin-top: 10px; font-size: 14px;">"Hola, soy tu asistente de Bancoagrícola..."</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VISTA 6: TIPOS DE DEUDA                        -->
+        <!-- ============================================== -->
+        <div id="deudas" class="view-section">
+            <div class="card" style="margin-bottom: 20px;">
+                <h3>Categorización por Tipos de Deuda</h3>
+                <p class="sub">Gestión segmentada según el origen del crédito</p>
+            </div>
+            <section class="grid-3">
+                <div class="card" style="border-top: 4px solid var(--purple);">
+                    <div class="kpi-header"><h3>Préstamos Estudiantiles</h3><div class="icon-box icon-purple"><i class="fa-solid fa-graduation-cap"></i></div></div>
+                    <div class="kpi-value" style="font-size: 20px;">345 Cuentas</div><p class="sub">Estrategia: Planes flexibles.</p><button class="btn-outline" style="width:100%; margin-top: 10px;">Ver Cartera</button>
+                </div>
+                <div class="card" style="border-top: 4px solid var(--green);">
+                    <div class="kpi-header"><h3>Préstamos para Vivienda</h3><div class="icon-box icon-green"><i class="fa-solid fa-house"></i></div></div>
+                    <div class="kpi-value" style="font-size: 20px;">128 Cuentas</div><p class="sub">Estrategia: Refinanciamiento.</p><button class="btn-outline" style="width:100%; margin-top: 10px;">Ver Cartera</button>
+                </div>
+                <div class="card" style="border-top: 4px solid var(--orange);">
+                    <div class="kpi-header"><h3>Préstamos Personales</h3><div class="icon-box icon-orange"><i class="fa-solid fa-user"></i></div></div>
+                    <div class="kpi-value" style="font-size: 20px;">612 Cuentas</div><p class="sub">Estrategia: Pago inmediato.</p><button class="btn-outline" style="width:100%; margin-top: 10px;">Ver Cartera</button>
+                </div>
+                <div class="card" style="border-top: 4px solid #1e3a8a;">
+                    <div class="kpi-header"><h3>Préstamos para Empresas</h3><div class="icon-box" style="background:#e0f2fe; color:#0284c7;"><i class="fa-solid fa-building"></i></div></div>
+                    <div class="kpi-value" style="font-size: 20px;">162 Cuentas</div><p class="sub">Estrategia: Reestructuración B2B.</p><button class="btn-outline" style="width:100%; margin-top: 10px;">Ver Cartera</button>
+                </div>
+            </section>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VISTA 7: CONVERSACIÓN EN VIVO (CHAT)           -->
+        <!-- ============================================== -->
+        <div id="vista-chat" class="view-section">
+            <button class="btn-text" onclick="volverInicio()"><i class="fa-solid fa-arrow-left"></i> Volver al panel</button>
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div><h3 id="chat-nombre-cliente">Manuel Rodríguez</h3><p class="sub" style="margin:0;" id="chat-estado">Llamada en curso con Agente IA</p></div>
+                    <span class="live-badge" id="badge-llamada"><i class="fa-solid fa-microphone"></i> En vivo - 02:16</span>
+                </div>
+                <div class="intervention-banner" id="banner-intervencion"><i class="fa-solid fa-triangle-exclamation"></i> Has intervenido la llamada. El Agente IA está pausado.</div>
+                <div class="chat-body" id="chat-mensajes">
+                    <div class="message msg-agent">Hola, le llamo del departamento de cobros de Bancoagrícola. Vemos que tiene un saldo pendiente. ¿Le gustaría revisar opciones de pago?<span class="msg-time">10:45 AM</span></div>
+                    <div class="message msg-client">Hola. Sí, la verdad he tenido problemas este mes y no he podido abonar.<span class="msg-time">10:45 AM</span></div>
+                    <div class="message msg-agent">Comprendo la situación. Para ayudarle, podemos dividir su saldo atrasado en dos pagos sin intereses moratorios si abona el 50% hoy. ¿Le parece bien?<span class="msg-time">10:46 AM</span></div>
+                </div>
+                <div class="chat-footer">
+                    <div class="chat-input-wrapper">
+                        <button class="btn-outline" id="btn-toggle-intervencion" onclick="toggleIntervencion()">Intervenir Llamada</button>
+                        <input type="text" class="chat-input" id="input-mensaje" placeholder="Modo solo escucha. Intervenga para escribir..." disabled>
+                        <button class="btn-dark" id="btn-enviar-mensaje" disabled onclick="enviarMensaje()"><i class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- VISTA 8: DETALLE DEL CLIENTE                   -->
+        <!-- ============================================== -->
+        <div id="vista-detalle" class="view-section">
+            <button class="btn-text" onclick="volverInicio()"><i class="fa-solid fa-arrow-left"></i> Volver al panel</button>
+            <div class="grid-2">
+                <div class="card">
+                    <div class="client-cell" style="margin-bottom: 20px;">
+                        <div class="client-initials" style="width: 50px; height: 50px; font-size: 18px;" id="det-iniciales">MA</div>
+                        <div><h2 id="det-nombre">Mauricio Flores</h2><p class="sub" style="margin:0;">Cuenta: <span id="det-cuenta">00392-12</span> | Préstamo Personal</p></div>
+                    </div>
+                    <div style="display: flex; gap: 20px;">
+                        <div><p class="sub">Teléfono</p><p class="bold-text">+503 7788-9900</p></div>
+                        <div><p class="sub">DUI</p><p class="bold-text">04593821-2</p></div>
+                        <div><p class="sub">Estado</p><span class="tag" id="det-badge" style="width:auto">Mora 45 días</span></div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h3>Resumen de Deuda</h3>
+                    <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                        <div><p class="sub">Saldo Pendiente</p><h2 style="color: var(--red);">$<span id="det-monto">1,450.00</span></h2></div>
+                        <div style="text-align: right;"><p class="sub">Préstamo Original</p><h2>$5,000.00</h2></div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 600;"><span>71% Pagado</span><span>29% Restante</span></div>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 71%;"></div></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h3>Historial de Cuotas</h3>
+                <p class="sub">Detalle de los pagos realizados y cuotas pendientes</p>
+                <table>
+                    <thead><tr><th>N° Cuota</th><th>Fecha de Pago</th><th>Monto</th><th>Estado</th></tr></thead>
+                    <tbody>
+                        <tr><td class="bold-text">Cuota 15</td><td>15 Noviembre 2026</td><td>$145.00</td><td><span class="tag tag-gray">Pendiente</span></td></tr>
+                        <tr style="background-color: #fff1f2;"><td class="bold-text">Cuota 14</td><td>15 Octubre 2026</td><td>$145.00</td><td><span class="tag tag-red">En Mora</span></td></tr>
+                        <tr><td class="bold-text">Cuota 13</td><td>15 Septiembre 2026</td><td>$145.00</td><td><span class="tag tag-green">Pagado</span></td></tr>
+                        <tr><td class="bold-text">Cuota 12</td><td>15 Agosto 2026</td><td>$145.00</td><td><span class="tag tag-green">Pagado</span></td></tr>
+                        <tr><td class="bold-text">Cuota 11</td><td>15 Julio 2026</td><td>$145.00</td><td><span class="tag tag-green">Pagado</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        let intervencionActiva = false;
+
+        // MANEJO DE MENÚ LATERAL (SPA LOGIC)
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                // Limpiar activos
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
+                
+                // Mostrar vista objetivo
+                const targetId = item.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active-view');
+                
+                // Cambiar Títulos
+                const textoMenu = item.textContent.trim();
+                document.getElementById('pageTitle').textContent = textoMenu;
+                
+                if(targetId === 'cartera') {
+                    document.getElementById('breadcrumb').textContent = "Cartera de gestión > Vista general";
+                    document.getElementById('pageTitle').textContent = "Banca Inteligente";
+                } else {
+                    const esConfig = targetId === 'voz' || targetId === 'deudas';
+                    const categoria = esConfig ? "Configuración" : "Menú Principal";
+                    document.getElementById('breadcrumb').textContent = `${categoria} > ${textoMenu}`;
+                }
+            });
+        });
+
+        function volverInicio() {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
+            document.getElementById('cartera').classList.add('active-view');
+            document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+            document.querySelector('[data-target="cartera"]').classList.add('active');
+            document.getElementById('breadcrumb').textContent = "Cartera de gestión > Vista general";
+            document.getElementById('pageTitle').textContent = "Banca Inteligente";
+        }
+
+        // FUNCIONALIDAD: FILTRO DE KPIs
+        function filtrarTabla(estado, elemento) {
+            document.querySelectorAll('.kpi-card').forEach(c => c.classList.remove('selected-kpi'));
+            elemento.classList.add('selected-kpi');
+            
+            document.querySelectorAll('.fila-tabla').forEach(fila => {
+                if (estado === 'Todas' || fila.getAttribute('data-estado') === estado) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        }
+
+        // FUNCIONALIDAD: CHAT (ESCUCHAR / INTERVENIR)
+        function abrirChat(nombre, modo) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
+            document.getElementById('vista-chat').classList.add('active-view');
+            document.getElementById('breadcrumb').textContent = "Cartera de gestión > Llamadas en vivo";
+            document.getElementById('pageTitle').textContent = "Monitor de Interacción";
+            document.getElementById('chat-nombre-cliente').textContent = nombre;
+
+            if(modo === 'escuchar') {
+                desactivarIntervencion();
+            } else {
+                activarIntervencion();
+            }
+        }
+
+        function toggleIntervencion() {
+            if (intervencionActiva) desactivarIntervencion();
+            else activarIntervencion();
+        }
+
+        function activarIntervencion() {
+            intervencionActiva = true;
+            document.getElementById('banner-intervencion').style.display = 'block';
+            document.getElementById('btn-toggle-intervencion').textContent = 'Devolver control a IA';
+            document.getElementById('btn-toggle-intervencion').classList.replace('btn-outline', 'btn-dark');
+            document.getElementById('chat-estado').textContent = 'Agente Humano al control';
+            document.getElementById('badge-llamada').style.backgroundColor = 'var(--orange-bg)';
+            document.getElementById('badge-llamada').style.color = 'var(--orange)';
+            
+            const input = document.getElementById('input-mensaje');
+            input.disabled = false;
+            input.placeholder = "Escribe un mensaje al cliente...";
+            input.focus();
+            document.getElementById('btn-enviar-mensaje').disabled = false;
+        }
+
+        function desactivarIntervencion() {
+            intervencionActiva = false;
+            document.getElementById('banner-intervencion').style.display = 'none';
+            document.getElementById('btn-toggle-intervencion').textContent = 'Intervenir Llamada';
+            document.getElementById('btn-toggle-intervencion').classList.replace('btn-dark', 'btn-outline');
+            document.getElementById('chat-estado').textContent = 'Llamada en curso con Agente IA';
+            document.getElementById('badge-llamada').style.backgroundColor = 'var(--green-bg)';
+            document.getElementById('badge-llamada').style.color = 'var(--green)';
+
+            const input = document.getElementById('input-mensaje');
+            input.disabled = true;
+            input.value = '';
+            input.placeholder = "Modo solo escucha. Intervenga para escribir...";
+            document.getElementById('btn-enviar-mensaje').disabled = true;
+        }
+
+        function enviarMensaje() {
+            const input = document.getElementById('input-mensaje');
+            const texto = input.value.trim();
+            if(texto !== '') {
+                const chatBody = document.getElementById('chat-mensajes');
+                const nuevoMsj = document.createElement('div');
+                nuevoMsj.className = 'message msg-agent';
+                nuevoMsj.style.borderColor = 'var(--accent-orange)';
+                const horaActual = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                nuevoMsj.innerHTML = `${texto} <span class="msg-time">${horaActual} (Tú)</span>`;
+                chatBody.appendChild(nuevoMsj);
+                input.value = '';
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }
+        }
+
+        document.getElementById('input-mensaje').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !this.disabled) enviarMensaje();
+        });
+
+        // FUNCIONALIDAD: DETALLE CLIENTE
+        function abrirDetalleCliente(nombre, cuenta, monto, diasMora, estadoTag) {
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active-view'));
+            document.getElementById('vista-detalle').classList.add('active-view');
+            document.getElementById('breadcrumb').textContent = "Cartera de gestión > Perfil del Cliente";
+            document.getElementById('pageTitle').textContent = "Detalle Financiero";
+
+            document.getElementById('det-nombre').textContent = nombre;
+            document.getElementById('det-cuenta').textContent = cuenta;
+            document.getElementById('det-monto').textContent = monto.toLocaleString('en-US', {minimumFractionDigits: 2});
+            document.getElementById('det-iniciales').textContent = nombre.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+            
+            const badge = document.getElementById('det-badge');
+            badge.textContent = diasMora > 0 ? `Mora ${diasMora} días` : estadoTag;
+            
+            // Asignar color dinámico al badge
+            badge.className = 'tag'; // Reset
+            if (estadoTag === 'Contactado') badge.classList.add('tag-green');
+            else if (estadoTag === 'Promesa') badge.classList.add('tag-purple');
+            else if (estadoTag === 'Sin contacto') badge.classList.add('tag-red');
+            else badge.classList.add('tag-orange');
+        }
+    </script>
+</body>
+</html>
